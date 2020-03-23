@@ -13,7 +13,7 @@ namespace CoreBlob.Models
         [Required(ErrorMessage = "Please Enter Your Name")]
         [Display(Name = "Name")]
         [MaxLength(100)]
-        public string MyProperty { get; set; }
+        public string Name { get; set; }
 
         [Required(ErrorMessage = "Please Enter Summary")]
         [Display(Name = "Summary")]
