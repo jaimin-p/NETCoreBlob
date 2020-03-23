@@ -11,7 +11,6 @@ namespace CoreBlob.Models
         public string FileName { get; set; }
         public string Extension { get; set; }
         public string ContentType { get; set; }
-        public int FileDetail_Id { get; set; }
         public byte[] Blob { get; set; }
         public virtual FileDetail FileDetail { get; set; }
     }

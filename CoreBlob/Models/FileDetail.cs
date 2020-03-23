@@ -21,5 +21,8 @@ namespace CoreBlob.Models
         public string Summary { get; set; }
 
         public DateTime Modified { get; set; }
+
+        public virtual ICollection<BlobSummary> Blobs { get; set; }
+
     }
 }

@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CoreBlob.Models;
+using System.IO;
+using Microsoft.AspNetCore.Http;
 
 namespace CoreBlob.Controllers
 {
@@ -48,21 +50,50 @@ namespace CoreBlob.Controllers
             return View();
         }
 
-        // POST: FileDetail/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+        // POST: FileDetail/Create      
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Summary,Modified")] FileDetail fileDetail)
+        [HttpPost]
+        public async Task<IActionResult> Create(FileDetail detail)
         {
             if (ModelState.IsValid)
             {
-                fileDetail.Modified = DateTime.Now;
-                _context.Add(fileDetail);
-                await _context.SaveChangesAsync();
+                try
+                {
+                    List<BlobSummary> fileDetails = new List<BlobSummary>();
+                    for (int i = 0; i < Request.Form.Files.Count; i++)
+                    {
+                        var file = Request.Form.Files[i];
+
+                        if (file != null)
+                        {
+                            var fileName = Path.GetFileName(file.FileName);
+
+                            BlobSummary fileDetail = new BlobSummary()
+                            {
+                                FileName = fileName,
+                                Extension = Path.GetExtension(fileName),
+                                Id = Guid.NewGuid(),
+                                Blob = GenerateBlob(file),
+                                ContentType = Request.Form.Files[i].ContentType
+                            };
+                            fileDetails.Add(fileDetail);
+                        }
+                    }
+
+                    detail.Modified = DateTime.Now;
+                    detail.Blobs = fileDetails;
+
+                    _context.FileDetail.Add(detail);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    
+                }
                 return RedirectToAction(nameof(Index));
             }
-            return View(fileDetail);
+            return View(detail);
+
         }
 
         // GET: FileDetail/Edit/5
@@ -81,12 +112,10 @@ namespace CoreBlob.Controllers
             return View(fileDetail);
         }
 
-        // POST: FileDetail/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        //POST Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Summary,Modified")] FileDetail fileDetail)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Summary")] FileDetail fileDetail)
         {
             if (id != fileDetail.Id)
             {
@@ -97,7 +126,28 @@ namespace CoreBlob.Controllers
             {
                 try
                 {
+                    for (int i = 0; i < Request.Form.Files.Count; i++)
+                    {
+                        var file = Request.Form.Files[i];
+
+                        if (file != null)
+                        {
+                            var fileName = Path.GetFileName(file.FileName);
+
+                            BlobSummary summary = new BlobSummary()
+                            {
+                                FileName = fileName,
+                                Extension = Path.GetExtension(fileName),
+                                Id = Guid.NewGuid(),
+                                Blob = GenerateBlob(file),
+                                ContentType = Request.Form.Files[i].ContentType
+                            };
+                            _context.Entry(summary).State = EntityState.Added;
+                        }
+                    }
+
                     fileDetail.Modified = DateTime.Now;
+                    _context.Entry(fileDetail).State = EntityState.Modified;
                     _context.Update(fileDetail);
                     await _context.SaveChangesAsync();
                 }
@@ -144,6 +194,17 @@ namespace CoreBlob.Controllers
             _context.FileDetail.Remove(fileDetail);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+       
+        private byte[] GenerateBlob(IFormFile file)
+        {
+            Stream stream = file.OpenReadStream();
+            using (var memoryStream = new MemoryStream())
+            {
+                stream.CopyTo(memoryStream);
+                return memoryStream.ToArray();
+            }
         }
 
         private bool FileDetailExists(int id)

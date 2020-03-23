@@ -4,14 +4,16 @@ using CoreBlob.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace CoreBlob.Migrations
 {
     [DbContext(typeof(BlobContext))]
-    partial class BlobContextModelSnapshot : ModelSnapshot
+    [Migration("20200323202221_Model Update")]
+    partial class ModelUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
