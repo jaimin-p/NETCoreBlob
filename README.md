@@ -1,7 +1,10 @@
-# NETCoreBlob
+## ASP .NET Core Saving and retrieving BLOBs from SQL SERVER
 
 ## Project Overview
 ```
-Saving and retrieving BLOBs from SQL SERVER using Entity Framwork Core.
-ASP.NET Core SDK 2.2
+SQL SERVER 2016
+.NET CORE 2.2
+EF Core 2.2
+Bootstrap
+jQuery
 ```
