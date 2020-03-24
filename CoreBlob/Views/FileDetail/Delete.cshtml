@@ -29,6 +29,19 @@
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Modified)
         </dd>
+        <dt class="col-sm-2">
+          Attachment(s)
+        </dt>
+        <dd class="col-sm-10">
+            @if (Model.Blobs.Count() == 0)
+            {
+                <span>No File</span>
+            }
+            else
+            {
+                <span>@Model.Blobs.Count()</span>
+            }
+        </dd>
     </dl>
     
     <form asp-action="Delete">
