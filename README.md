@@ -1,4 +1,4 @@
-##ASP .NET Core Saving and retrieving BLOBs from SQL SERVER
+## ASP .NET Core Saving and retrieving BLOBs from SQL SERVER
 
 ## Project Overview
 ```
